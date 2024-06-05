@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, __version__
+from flask import Flask, request, make_response
 from metric import Metric
 from store import Store
 import json
@@ -37,7 +37,6 @@ def remove_metrics():
 
 
 if __name__ == '__main__':
-    print(__version__)
     app.run(host='0.0.0.0')
 
 
