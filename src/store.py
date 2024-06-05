@@ -31,7 +31,7 @@ class Store:
         self.metrics.update({metric.unique_id: metric})
 
     def remove(self, unique_id_str: str):
-        """Remove metric from the store by unique id string"""
+        """Remove metric from the store by unique id string."""
         unique_id = get_metric_uuid(unique_id_str)
         if unique_id in self.metrics.keys():
             self.metrics.pop(unique_id)

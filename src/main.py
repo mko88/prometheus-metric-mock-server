@@ -3,9 +3,9 @@ from metric import Metric
 from store import Store
 import json
 
-# Store all metrics into the store object
+# Store all metrics into the store object.
 STORE = Store()
-# The flask application
+# The flask application.
 app = Flask(__name__)
 
 
@@ -36,7 +36,7 @@ def add_metrics():
 
 @app.route('/remove', methods=['POST'])
 def remove_metrics():
-    """Removes a metric by its readable unique id string - name{label=\"value\"}"""
+    """Removes a metric by its readable unique id string - name{label=\"value\"}."""
     request_data = json.loads(request.data)
     for name in request_data:
         STORE.remove(unique_id_str=name)
@@ -44,5 +44,5 @@ def remove_metrics():
 
 
 if __name__ == '__main__':
-    """Run the application"""
+    """Run the application."""
     app.run(host='0.0.0.0')
