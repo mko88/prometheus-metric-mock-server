@@ -2,11 +2,27 @@ from flask import Flask, request, make_response
 from metric import Metric
 from store import Store
 import json
+import logging
+import sys
+
+# Version.
+version = '0.0.1'
+
+# Setup logging level info on stdout.
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 # Store all metrics into the store object.
 STORE = Store()
 # The flask application.
 app = Flask(__name__)
+
+
+@app.route('/', methods=['GET'])
+def index():
+    """Default index message"""
+    return f'<h1>Python Metric Mock Server ({version}) - visit or scrape the /metrics endpoint.</h1>'
 
 
 @app.route('/metrics', methods=['GET'])
