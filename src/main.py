@@ -56,7 +56,7 @@ def add_metrics():
 
 @app.route('/metrics', methods=['DELETE'])
 def remove_metrics():
-    """Removes a metric. A whole metric object can be provided, only name and labels are used for identification."""
+    """Removes metrics. A whole metric object can be provided, only name and labels are used for identification."""
     request_data = json.loads(request.data)
     for metric_data in request_data:
         STORE.remove(metric=dict_to_metric(metric_data))

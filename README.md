@@ -23,7 +23,7 @@ docker run --rm -p 5000:5000 prometheus-metric-mock-server
 After the application is running you should be able to access it at `localhost:5000`.
 # Endpoints
 ## GET /
-Default index page. Just prints a message
+Default index page. Just prints a message.
 ## GET /metrics
 The mocked metrics in Prometheus format.
 ```
@@ -109,7 +109,7 @@ The store content containing the metric unique ids and strings.
 ```
 
 ## DELETE /remove_by_unique_id
-Removes metrics by unique ids
+Removes metrics by unique ids.
 ```json
 [
     "1a3c07c9-d651-53a8-83ad-0ef5ceb94814",
