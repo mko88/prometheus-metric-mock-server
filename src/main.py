@@ -1,5 +1,5 @@
 from flask import Flask, request, make_response
-from metric import Metric
+from metric import dict_to_metric
 from store import Store
 import json
 import logging
@@ -25,37 +25,50 @@ def index():
     return f'<h1>Python Metric Mock Server ({version}) - visit or scrape the /metrics endpoint.</h1>'
 
 
-@app.route('/metrics', methods=['GET'])
-def get_metrics():
-    """Returns all available metrics."""
+@app.route('/store', methods=['GET'])
+def export_metrics_store():
+    """Export the store unique ids and unique id string"""
     # Make the response from store content
     response = make_response(STORE.export(), 200)
+    # JSON format
+    response.mimetype = 'application/json'
+    return response
+
+
+@app.route('/metrics', methods=['GET'])
+def export_metrics_prometheus():
+    """Returns all available metrics."""
+    # Make the response from store content
+    response = make_response(STORE.export_prometheus(), 200)
     # We need it as simple text
     response.mimetype = 'text/plain'
     return response
 
 
-@app.route('/add', methods=['POST'])
+@app.route('/metrics', methods=['POST'])
 def add_metrics():
     """Add metric request."""
     request_data = json.loads(request.data)
-    for metric in request_data:
-        STORE.upsert(Metric(name=metric['name'],
-                            metric_type=metric['metric_type'],
-                            description=metric['description'],
-                            value=metric['value'],
-                            labels=metric['labels'],
-                            timestamp=metric['timestamp'],
-                            print_timestamp=metric['print_timestamp']))
+    for metric_data in request_data:
+        STORE.upsert(dict_to_metric(metric_data))
     return make_response('OK', 200)
 
 
-@app.route('/remove', methods=['POST'])
+@app.route('/metrics', methods=['DELETE'])
 def remove_metrics():
-    """Removes a metric by its readable unique id string - name{label=\"value\"}."""
+    """Removes a metric. A whole metric object can be provided, only name and labels are used for identification."""
     request_data = json.loads(request.data)
-    for name in request_data:
-        STORE.remove(unique_id_str=name)
+    for metric_data in request_data:
+        STORE.remove(metric=dict_to_metric(metric_data))
+    return make_response('OK', 200)
+
+
+@app.route('/remove_by_unique_id', methods=['DELETE'])
+def remove_metrics_by_unique_id():
+    """Removes a metrics by list of unique ids."""
+    request_data = json.loads(request.data)
+    for uid in request_data:
+        STORE.remove_by_unique_id(unique_id=uid)
     return make_response('OK', 200)
 
 

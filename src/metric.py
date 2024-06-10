@@ -31,9 +31,15 @@ class MetricLabels:
         self.labels = dict(sorted(self.labels.items()))
 
 
-def get_metric_uuid(unique_id_str: str):
-    """Generate UUID for the metric based on its unique id string."""
-    return uuid.uuid5(uuid.NAMESPACE_URL, unique_id_str)
+def dict_to_metric(obj: dict):
+    """Create a metric from a dictionary, coming from the rest endpoints."""
+    return Metric(name=obj['name'] if 'name' in obj else None,
+                  metric_type=obj['metric_type'] if 'metric_type' in obj else None,
+                  description=obj['description'] if 'description' in obj else None,
+                  value=obj['value'] if 'value' in obj else None,
+                  labels=obj['labels'] if 'labels' in obj else None,
+                  timestamp=obj['timestamp'] if 'timestamp' in obj else None,
+                  print_timestamp=obj['print_timestamp'] if 'print_timestamp' in obj else None)
 
 
 def default_metric():
@@ -72,9 +78,21 @@ class Metric:
         # Sort the labels alphabetically so we have consistent unique_id_str.
         self.labels.sort()
         # Metrics are unique by name and labels.
-        self.unique_id_str = f'{name}{self.labels}'
+        self.unique_id_str = f'{self.name}{self.labels}'
         # Metrics uuid based on unique_id_str.
-        self.unique_id = get_metric_uuid(self.unique_id_str)
+        self.unique_id = self.get_metric_uuid()
+
+    def get_metric_uuid(self):
+        """Generate UUID for the metric based on its unique id string."""
+        return str(uuid.uuid5(uuid.NAMESPACE_URL, self.get_unique_id_string()))
+
+    def get_unique_id_string(self):
+        """Return the unique id string"""
+        return f'{self.name}{self.labels}'
+
+    def get_unique_id(self):
+        """Return the unique id"""
+        return f'{self.unique_id}'
 
     def prometheus_header(self):
         """Returns the metric header in prometheus format."""
@@ -86,3 +104,6 @@ class Metric:
         """Returns the metric - its name, labels, value and timestamp if required."""
         ts = self.timestamp if self.print_timestamp else ""
         return f'{self.name}{self.labels} {self.value} {ts}\n'
+
+    def __str__(self):
+        return f'{self.unique_id_str} ({self.unique_id})'

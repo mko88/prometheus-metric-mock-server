@@ -1,4 +1,5 @@
-from metric import Metric, get_metric_uuid, default_metric
+from metric import Metric, default_metric
+import json
 
 
 class Store:
@@ -8,6 +9,13 @@ class Store:
         self.upsert(default_metric())
 
     def export(self):
+        """Export the metric store with uid and uid string representation."""
+        output = []
+        for metric in self.metrics.values():
+            output.append({'unique_id': metric.unique_id, 'unique_id_string': metric.unique_id_str})
+        return json.dumps(output)
+
+    def export_prometheus(self):
         """Export the store content to string that can be scraped by Prometheus."""
         output = ''
         # Gather unique metric names.
@@ -30,11 +38,19 @@ class Store:
             print(f'Adding metric: {metric.unique_id_str} {metric.value}')
         self.metrics.update({metric.unique_id: metric})
 
-    def remove(self, unique_id_str: str):
-        """Remove metric from the store by unique id string."""
-        unique_id = get_metric_uuid(unique_id_str)
+    def remove_by_unique_id(self, unique_id: str):
+        """Remove metric from the store by unique id."""
         if unique_id in self.metrics.keys():
-            self.metrics.pop(unique_id)
-            print(f'Removed metric: {unique_id_str}')
+            removed_metric = self.metrics.pop(unique_id)
+            print(f'Removed metric by uid {unique_id}: {removed_metric.unique_id_str}')
         else:
-            print(f'Metric does not exist. Nothing removed: {unique_id_str}')
+            print(f'Metric not found by {unique_id}. Nothing removed.')
+
+    def remove(self, metric: Metric):
+        """Remove metric from the store by unique id string."""
+        if metric.unique_id in self.metrics.keys():
+            removed_metric = self.metrics.pop(metric.unique_id)
+            print(f'Removed metric by name and labels: {removed_metric.unique_id_str}. '
+                  f'Unique id was {removed_metric.unique_id}')
+        else:
+            print(f'Metric not found by name and labels: {metric.unique_id_str}. Nothing removed.')
