@@ -3,7 +3,7 @@ prometheus-metric-mock-server is small flask application that can
 simulate prometheus metrics and be scraped by a prometheus server.
 
 By default, the `prometheus_metric_mock_server_up` metric is provided.
-You can be removed with the `/remove` endpoint.
+It can be removed with the `DELETE /metrics` endpoint.
 ## Requirements
 The application is written on python 3.8 and uses flask 3.0.3 bit it will
 probably work just fine with different versions.
